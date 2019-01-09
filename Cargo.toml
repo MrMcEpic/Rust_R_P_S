@@ -1,6 +1,6 @@
 [package]
 name = "RPS"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["MrMcEpic <45011453+MrMcEpic@users.noreply.github.com>"]
 edition = "2018"
 

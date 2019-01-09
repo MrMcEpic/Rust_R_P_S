@@ -41,7 +41,7 @@ fn text(){
 	}	
 }
 
-fn to_title(s1: String) -> String{
+fn to_title(s1: &String) -> String{
     let mut v: Vec<char> = s1.chars().collect();
     v[0] = v[0].to_uppercase().nth(0).unwrap();
     let s2: String = v.into_iter().collect();
@@ -75,15 +75,16 @@ fn again(){
 
 fn game(){
     let user = choice_input();
-        let s3 = to_title(user.clone());
+        let s3 = to_title(&user);
     println!("You chose {}!", s3);
     thread::sleep(time::Duration::from_millis(500));
     let comp = computer_choice();
-        let s3 = to_title(comp.clone());
+        let s3 = to_title(&comp);
     println!("Computer chose {}!", s3);
     thread::sleep(time::Duration::from_millis(200));
-    let result = logic(user, comp);
+    let mut result = logic(user, comp);
         let you = if result == "draw"{
+            result = String::from("Draw");
             ""
         }else{
             "You "
