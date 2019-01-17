@@ -1,52 +1,13 @@
-use std::io;
 use rand::Rng;
-use std::thread;
-use std::time;
-use wincolor::{Console, Color, Intense};
-use winconsole::console;
+use std::{io, thread::sleep, time::Duration};
 
+mod text;
 
-fn text(){
-	let mut con = Console::stdout().unwrap();
-	console::set_title("Rock Paper Scissors").unwrap();
-
-	if let Some((w, _h)) = term_size::dimensions() {
-		con.fg(Intense::Yes, Color::Cyan).unwrap();
-		thread::sleep(time::Duration::from_millis(500));
-
-		println!("{holder:^width$}", width=w, holder="~-==Rock Paper Scissors==-~");
-
-		con.reset().unwrap();
-		thread::sleep(time::Duration::from_millis(1000));
-		con.fg(Intense::Yes, Color::Green).unwrap();
-
-		println!("{holder:^width$}", width=w, holder="~-==Now built in Rust!==-~");
-
-		thread::sleep(time::Duration::from_millis(1000));
-		con.reset().unwrap();
-	} else {
-		con.fg(Intense::Yes, Color::Cyan).unwrap();
-		thread::sleep(time::Duration::from_millis(500));
-
-		println!("{holder:^width$}", width=110, holder="~-==Rock Paper Scissors==-~");
-
-		con.reset().unwrap();
-		thread::sleep(time::Duration::from_millis(1000));
-		con.fg(Intense::Yes, Color::Green).unwrap();
-
-		println!("{holder:^width$}", width=110, holder="~-==Now built in Rust!==-~");
-
-		thread::sleep(time::Duration::from_millis(1000));
-		con.reset().unwrap();
-	}	
-}
-
-fn to_title(s1: &String) -> String{
+fn to_title(s1: &str) -> String{
     let mut v: Vec<char> = s1.chars().collect();
     v[0] = v[0].to_uppercase().nth(0).unwrap();
     let s2: String = v.into_iter().collect();
-    let s3 = &s2;
-    s3.to_string()
+    s2
 }
 
 fn again(){
@@ -61,6 +22,12 @@ fn again(){
 
        if choice == "y" || choice == "n"{
            break choice;
+       }else if choice == "yes"{
+            choice = "y".to_string();
+            break choice;
+       }else if choice == "no"{
+            choice = "n".to_string();
+            break choice;
        }
     };
     if choice == "y"{
@@ -75,16 +42,14 @@ fn again(){
 
 fn game(){
     let user = choice_input();
-        let s3 = to_title(&user);
-    println!("You chose {}!", s3);
-    thread::sleep(time::Duration::from_millis(500));
+    println!("You chose {}!", to_title(&user));
+    sleep(Duration::from_millis(500));
     let comp = computer_choice();
-        let s3 = to_title(&comp);
-    println!("Computer chose {}!", s3);
-    thread::sleep(time::Duration::from_millis(200));
-    let mut result = logic(user, comp);
+    println!("Computer chose {}!", to_title(&comp));
+    sleep(Duration::from_millis(300));
+    let mut result = logic(&user, &comp);
         let you = if result == "draw"{
-            result = String::from("Draw");
+            result = to_title(&result);
             ""
         }else{
             "You "
@@ -99,53 +64,60 @@ fn game(){
 }
 
 fn main() {
-    text();
+    text::text();
     game();
 }
 
-fn logic(user: String, comp: String) -> String {
-    let mut return_val = String::new();
+fn logic(user: &str, comp: &str) -> String {
+    let mut return_val = "";
     if user == comp {
-        return_val = String::from("draw");
+        return_val = "draw";
     }else{
-        if user == "rock"{
-            if comp == "paper"{
-                return_val = String::from("loss");
-            }else{
-                return_val = String::from("win")
-            }
-        } else if user == "paper"{
-            if comp == "scissors"{
-                return_val = String::from("loss");
-            }else{
-                return_val = String::from("win")
-            }
-        } else if user == "scissors"{
-            if comp == "rock"{
-                return_val = String::from("loss");
-            }else{
-                return_val = String::from("win")
+        match user{
+            "rock" => {
+                if comp == "paper"{
+                    return_val = "lose";
+                }else{
+                    return_val = "win";
+                }
+            },
+            "paper" => {
+                 if comp == "scissors"{
+                    return_val = "lose";
+                }else{
+                    return_val = "win";
+                }
+            },
+            "scissors" => {
+                if comp == "rock"{
+                    return_val = "lose";
+                }else{
+                    return_val = "win";
+                }
+            },
+            _ =>{
+                println!("Error")
             }
         }
     }
-    return_val
+    return_val.to_string()
 }
 
 fn computer_choice() -> String{
     let comp_num = rand::thread_rng().gen_range(1,4);
-    let mut _comp_val = String::new();
+    let mut _comp_val = "";
     match comp_num {
-        1 => _comp_val = "rock".to_string(),
-        2 => _comp_val = "paper".to_string(),
-        3 => _comp_val = "scissors".to_string(),
-        _ => _comp_val = "broken".to_string(),
+        1 => _comp_val = "rock",
+        2 => _comp_val = "paper",
+        3 => _comp_val = "scissors",
+        _ => _comp_val = "broken",
     };
-    _comp_val
+    _comp_val.to_string()
 }
 
 fn choice_input() -> String{
     loop{
-        println!("Rock/Paper/Scissors ?");
+        println!("Rock/Paper/Scissors?");
 
         let mut choice = String::new();
 
@@ -155,7 +127,7 @@ fn choice_input() -> String{
         choice = choice.trim().to_ascii_lowercase();
 
         if choice == "rock" || choice == "paper" || choice == "scissors" {
-            break choice;
+            break choice; //returns choice to loop which then returns to function call
         }
     }//no ; here means it returns loop value to where it was called
 }
